@@ -20,7 +20,6 @@ Plugin 'honza/vim-snippets'
 Plugin 'garbas/vim-snipmate'
 " Commenting and uncommenting stuff"
 Plugin 'tomtom/tcomment_vim'
-Plugin 'thoughtbot/vim-rspec'
 Plugin 'ecomba/vim-ruby-refactoring'
 Plugin 'scrooloose/nerdtree'
 Plugin 'scrooloose/nerdcommenter'
@@ -31,7 +30,7 @@ Plugin 'jlanzarotta/bufexplorer'
 Plugin 'vim-ruby/vim-ruby'
 Plugin 'tpope/vim-bundler.git'
 " Good looking bottom :)
-Plugin 'vim-airline/vim-airline-themes'
+Plugin 'itchyny/lightline.vim'
 " Git tools
 Plugin 'tpope/vim-fugitive'
 " Every one should have a pair (Autogenerate pairs for {[(  )]})
@@ -73,10 +72,16 @@ Plugin 'c-brenn/phoenix.vim'
 Plugin 'tpope/vim-projectionist'
 " Asynchronously runs programs using Neovim's or Vim's job-control functionality.
 Plugin 'neomake/neomake'
+" Wrapper for running tests on different granularities
+Plugin 'janko-m/vim-test'
+" A dark Vim/Neovim color schemeith colors inspired by the excellent One Dark
+" syntax theme for the Atom text editor
+Plugin 'joshdick/onedark.vim'
+" Pairs of handy bracket mappings
+Plugin 'tpope/vim-unimpaired'
 
 call vundle#end()            " required
 
-syntax enable
 set encoding=utf-8
 set showcmd                     " display incomplete commands
 set viminfo^=!
@@ -127,13 +132,15 @@ set directory=~/.vim/tmp     " Where temporary files will go.
    \ endif
 
 " Theme specific options 
-"colorscheme gruvbox 
-"let g:rehash256=1
-"set t_Co=256
+" syntax enable
+syntax on
+colorscheme onedark 
 
-syntax enable
-set background=dark
-colorscheme solarized
+"set background=dark
+"colorscheme solarized
+
+" Remove right scrollbar
+set guioptions-=r 
 
 " Use ack instead of grep
 set grepprg=ack
@@ -143,7 +150,7 @@ let g:rails_default_file='config/database.yml'
 let g:rubycomplete_buffer_loading = 1
 let g:rubycomplete_rails = 1
 
-" ELIXIR
+" Elixir
 let g:alchemist#elixir_erlang_src = '/usr/local/share/src'
 
 " Settings for gist-vim
@@ -151,9 +158,21 @@ let g:gist_clip_command = 'pbcopy'
 let g:gist_open_browser_after_post = 1
 
 " Airline config
-let g:airline_theme='luna'
-let g:airline_powerline_fonts=1
-set laststatus=2  " Always show status line.
+"let g:airline_theme='onedark'
+"let g:airline_powerline_fonts=1
+"set laststatus=2  " Always show status line.
+" Lightline config
+set laststatus=2
+let g:lightline = {
+  \ 'colorscheme': 'onedark',
+  \ 'active': {
+  \   'left': [ [ 'mode', 'paste' ],
+  \             [ 'gitbranch', 'readonly', 'filename', 'modified' ] ]
+  \ },
+  \ 'component_function': {
+  \   'gitbranch': 'fugitive#head'
+  \ },
+  \ }
 
 " Don't hide Json syntax.
 "let g:vim_json_syntax_conceal = 0 
@@ -169,9 +188,12 @@ set statusline+=%#warningmsg#
 set statusline+=%{SyntasticStatuslineFlag()}
 set statusline+=%*
 
-let g:syntastic_always_populate_loc_list = 0
+" Rubocop config file
+let g:vimrubocop_config = '/Users/dc/Developer/liqid/liqid-web-api/.rubocop.yml'
+
+let g:syntastic_always_populate_loc_list = 1
 let g:syntastic_auto_loc_list = 0
-let g:syntastic_check_on_open = 1
+let g:syntastic_check_on_open = 0
 let g:syntastic_check_on_wq = 0
 let g:syntastic_error_symbol = "✗"
 let g:syntastic_style_error_symbol = "✗"
@@ -179,6 +201,7 @@ let g:syntastic_warning_symbol = "⚠"
 let g:syntastic_style_warning_symbol = "⚠"
 let g:syntastic_enable_signs=1
 let g:syntastic_enable_highlighting=0
+
 " Line highlighting for Syntastic
 "highlight SyntasticErrorLine guibg=#a00101 
 "highlight SyntasticWarningLine guibg=#66653f
@@ -191,6 +214,9 @@ let g:syntastic_erlang_checkers = ['escript']
 let g:syntastic_enable_erlang_checker = 1
 let g:syntastic_javascript_checkers = ['eslint']
 let g:syntastic_enable_javascript_checker = 1
+
+" Disbale Syntastic by default
+let g:syntastic_mode_map = { 'mode': 'passive', 'active_filetypes': [],'passive_filetypes': [] }
 
 " Gutentags 
 let g:gutentags_cache_dir = '~/.tags_cache'
@@ -209,8 +235,31 @@ noremap   <Down>   <NOP>
 noremap   <Left>   <NOP>
 noremap   <Right>  <NOP>
 
+" NERDTree mappings
+map <Leader>nd :NERDTree<cr>
+
+" Toggle of Tagbar window
+nmap <F8> :TagbarToggle<CR>
+
+" Switch between the last two files
+nnoremap <leader><leader> <c-^>
+
+" Clear last used search pattern
+nmap <silent> <leader>c :let @/ = ""<CR>
+
 " Rubocop Shortcut(s) 
 nmap <Leader>r :RuboCop<CR>
+
+" Error window for syntastic plugin
+nmap <Leader>sc :lclose<CR>
+nmap <Leader>sr :SyntasticCheck<CR> :lopen<CR>
+
+" vim-test 
+nmap <silent> <leader>t :TestNearest<CR>
+nmap <silent> <leader>T :TestFile<CR>
+nmap <silent> <leader>a :TestSuite<CR>
+nmap <silent> <leader>l :TestLast<CR>
+nmap <silent> <leader>g :TestVisit<CR>
 
 """"""""""""""""""""""""""""""""""""""""
 " BACKUP / TMP FILES
@@ -252,17 +301,6 @@ if exists("+undofile")
   set undofile
 endif
 
-" RSpec.vim mappings
-map <Leader>t :call RunCurrentSpecFile()<CR>
-map <Leader>s :call RunNearestSpec()<CR>
-map <Leader>l :call RunLastSpec()<CR>
-map <Leader>a :call RunAllSpecs()<CR>
-
-" NERDTree mappings
-map <Leader>nd :NERDTree<cr>
-
-" Toggle of Tagbar window
-nmap <F8> :TagbarToggle<CR>
 
 " bufexplorer specific settings
 let g:bufExplorerSortBy='name'       " Sort by the buffer's name.
@@ -272,9 +310,6 @@ let g:bufExplorerSortBy='name'       " Sort by the buffer's name.
 let g:ruby_path = system('rvm current')
 
 :cd %:p:h
-
-" Switch between the last two files
-nnoremap <leader><leader> <c-^>
 
 " ******************************
 " Disable scrollbar in NERDtree
@@ -322,3 +357,19 @@ endif
 " Run Neomake on current file on every write.
 autocmd! BufWritePost * Neomake
 
+"Credit joshdick
+"Use 24-bit (true-color) mode in Vim/Neovim when outside tmux.
+"If you're using tmux version 2.2 or later, you can remove the outermost $TMUX check and use tmux's 24-bit color support
+"(see < http://sunaku.github.io/tmux-24bit-color.html#usage > for more information.)
+if (empty($TMUX))
+  if (has("nvim"))
+  "For Neovim 0.1.3 and 0.1.4 < https://github.com/neovim/neovim/pull/2198 >
+  let $NVIM_TUI_ENABLE_TRUE_COLOR=1
+  endif
+  "For Neovim > 0.1.5 and Vim > patch 7.4.1799 < https://github.com/vim/vim/commit/61be73bb0f965a895bfb064ea3e55476ac175162 >
+  "Based on Vim patch 7.4.1770 (`guicolors` option) < https://github.com/vim/vim/commit/8a633e3427b47286869aa4b96f2bfc1fe65b25cd >
+  " < https://github.com/neovim/neovim/wiki/Following-HEAD#20160511 >
+  if (has("termguicolors"))
+    set termguicolors
+  endif
+endif
