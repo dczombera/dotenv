@@ -29,6 +29,8 @@ Plugin 'jlanzarotta/bufexplorer'
 " Vim Ruby
 Plugin 'vim-ruby/vim-ruby'
 Plugin 'tpope/vim-bundler.git'
+" RSpec runner
+Plugin 'thoughtbot/vim-rspec'
 " Good looking bottom :)
 Plugin 'itchyny/lightline.vim'
 " Git tools
@@ -79,6 +81,8 @@ Plugin 'janko-m/vim-test'
 Plugin 'joshdick/onedark.vim'
 " Pairs of handy bracket mappings
 Plugin 'tpope/vim-unimpaired'
+" Ruby syntax extensions for highlighting YARD documentation
+Plugin 'sheerun/vim-yardoc'
 
 call vundle#end()            " required
 
@@ -208,6 +212,7 @@ let g:syntastic_enable_highlighting=0
 
 " Checker configuration for Syntastic 
 let g:syntastic_ruby_checkers = ['rubocop', 'mri', 'rubylint']
+let g:syntastic_enable_ruby_checker = 1
 let g:syntastic_elixir_checkers = ['elixir']
 let g:syntastic_enable_elixir_checker = 1
 let g:syntastic_erlang_checkers = ['escript']
@@ -224,6 +229,9 @@ let g:gutentags_cache_dir = '~/.tags_cache'
 " Key mappings
 " ***********
 let mapleader = ","
+
+" YARD tags highlighting
+hi link yardGenericTag rubyInstanceVariable
 
 " Get rid of arrow keys
 inoremap  <Up>     <NOP>
