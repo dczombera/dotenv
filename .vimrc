@@ -57,7 +57,7 @@ Plugin 'mxw/vim-jsx'
 " Distinct highlighting of keywords vs values, JSON-specific (non-JS) warnings, quote concealing.
 Plugin 'elzr/vim-json'
 " Elixir Plugins
-Plugin 'elixir-lang/vim-elixir'
+Plugin 'elixir-editors/vim-elixir'
 Plugin 'slashmili/alchemist.vim'
 " Erlang Runtime
 Plugin 'vim-erlang/vim-erlang-runtime'
@@ -83,6 +83,14 @@ Plugin 'joshdick/onedark.vim'
 Plugin 'tpope/vim-unimpaired'
 " Ruby syntax extensions for highlighting YARD documentation
 Plugin 'sheerun/vim-yardoc'
+" A vim plugin wrapper for prettier,
+Plugin 'prettier/vim-prettier'
+" Open and search devdocs
+Plugin 'rhysd/devdocs.vim'
+" Elm
+Plugin 'elmcast/elm-vim' 
+" Run your favorite search tool from vim
+Plugin 'mileszs/ack.vim'
 
 call vundle#end()            " required
 
@@ -94,9 +102,11 @@ set shell=/bin/sh               " Getting rvm, vim and zsh to work
 
 "" Whitespace
 set nowrap                      " don't wrap lines
-set tabstop=2 shiftwidth=2      " a tab is two spaces (or set this to 4)
+set tabstop=2 shiftwidth=2      " by default a tab is two spaces (or set this to 4)
 set expandtab                   " use spaces, not tabs (optional)
 set backspace=indent,eol,start  " backspace through everything in insert mode
+"" Custom indentation for javascript.jsx
+autocmd Filetype javascript.jsx setlocal ts=4 sw=4 sts=0 expandtab 
 
 "" Searching
 set hlsearch                    " highlight matches
@@ -139,6 +149,13 @@ set directory=~/.vim/tmp     " Where temporary files will go.
 " syntax enable
 syntax on
 colorscheme onedark 
+" Colors for search highlight
+" bg (background): magenta
+" fg (foreground): black
+" GUI 
+hi Search guibg=#c678dd guifg=#282c34
+" terminal
+hi Search ctermfg=black ctermbg=magenta
 
 "set background=dark
 "colorscheme solarized
@@ -160,6 +177,9 @@ let g:alchemist#elixir_erlang_src = '/usr/local/share/src'
 " Settings for gist-vim
 let g:gist_clip_command = 'pbcopy'
 let g:gist_open_browser_after_post = 1
+
+" Enable syntax highlighting for JSDocs
+let g:javascript_plugin_jsdoc = 1
 
 " Airline config
 "let g:airline_theme='onedark'
@@ -196,7 +216,7 @@ set statusline+=%*
 let g:vimrubocop_config = '/Users/dc/Developer/liqid/liqid-web-api/.rubocop.yml'
 
 let g:syntastic_always_populate_loc_list = 1
-let g:syntastic_auto_loc_list = 0
+let g:syntastic_auto_loc_list = 1
 let g:syntastic_check_on_open = 0
 let g:syntastic_check_on_wq = 0
 let g:syntastic_error_symbol = "✗"
@@ -217,8 +237,10 @@ let g:syntastic_elixir_checkers = ['elixir']
 let g:syntastic_enable_elixir_checker = 1
 let g:syntastic_erlang_checkers = ['escript']
 let g:syntastic_enable_erlang_checker = 1
-let g:syntastic_javascript_checkers = ['eslint']
+let g:syntastic_javascript_checkers = []
+autocmd FileType javascript let b:syntastic_checkers = findfile('.eslintrc', '.;') !=# '' ? ['eslint'] : []
 let g:syntastic_enable_javascript_checker = 1
+let g:elm_syntastic_show_warnings = 1
 
 " Disbale Syntastic by default
 let g:syntastic_mode_map = { 'mode': 'passive', 'active_filetypes': [],'passive_filetypes': [] }
@@ -247,7 +269,7 @@ noremap   <Right>  <NOP>
 map <Leader>nd :NERDTree<cr>
 
 " Toggle of Tagbar window
-nmap <F8> :TagbarToggle<CR>
+nmap <Leader>cv :TagbarToggle<CR>
 
 " Switch between the last two files
 nnoremap <leader><leader> <c-^>
@@ -268,6 +290,9 @@ nmap <silent> <leader>T :TestFile<CR>
 nmap <silent> <leader>a :TestSuite<CR>
 nmap <silent> <leader>l :TestLast<CR>
 nmap <silent> <leader>g :TestVisit<CR>
+
+" devdocs
+nmap K <Plug>(devdocs-under-cursor)
 
 """"""""""""""""""""""""""""""""""""""""
 " BACKUP / TMP FILES
@@ -380,4 +405,23 @@ if (empty($TMUX))
   if (has("termguicolors"))
     set termguicolors
   endif
+endif
+
+" ************
+" * Grepping *
+" ************
+
+" bind K to grep word under cursor
+noremap <Leader>s :grep! "\b<C-R><C-W>\b"<CR>:cw<CR>
+" ref: https://robots.thoughtbot.com/faster-grepping-in-vim#override-to-use-the-silver-searcher
+" The Silver Searcher
+if executable('ag')
+  " Use ag over grep
+  set grepprg=ag\ --nogroup\ --nocolor
+
+  " Use ag in CtrlP for listing files. Lightning fast and respects .gitignore
+  let g:ctrlp_user_command = 'ag %s -l --nocolor -g ""'
+
+  " ag is fast enough that CtrlP doesn't need to cache
+  let g:ctrlp_use_caching = 0
 endif

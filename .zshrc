@@ -2,7 +2,7 @@
 # export PATH=$HOME/bin:/usr/local/bin:$PATH
 
 # Path to your oh-my-zsh installation.
-export ZSH=/Users/dennisczombera/.oh-my-zsh
+export ZSH=/Users/dc/.oh-my-zsh
 
 # Set name of the theme to load. Optionally, if you set this to "random"
 # it'll load a random theme each time that oh-my-zsh is loaded.
@@ -78,7 +78,8 @@ source $ZSH/oh-my-zsh.sh
 # plugins, and themes. Aliases can be placed here, though oh-my-zsh
 # users are encouraged to define aliases within the ZSH_CUSTOM folder.
 # For a full list of active aliases, run `alias`.
-#
+alias github="open -a GitHub\ Desktop" 
+
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
@@ -115,6 +116,8 @@ export PATH="/usr/local/git/bin:$PATH"
 # npm
 export PATH="/usr/local/bin/npm:$PATH"
 
+export PATH="/usr/local/sbin:$PATH"
+
 export PATH="$PATH:$HOME/.rvm/bin" # Add RVM to PATH for scripting
 
 # Docker completion
@@ -124,3 +127,13 @@ export GOPATH=$HOME/Developer/Golang
 
 # To activate the syntax highlighting, add the following at the end of your .zshrc:
 source /usr/local/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+source ~/.smartcd_config
+
+export CLASSPATH=$CLASSPATH:~/Library/Java/Extensions/algs4.jar
+
+export REDIS_URL="redis://localhost:6379/3"
+
+alias code="/Applications/Visual\ Studio\ Code\ .app/Contents/Resources/app/bin/code"
+
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
